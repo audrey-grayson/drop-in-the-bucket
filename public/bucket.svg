@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 110" width="100" height="110">
+  <defs>
+    <clipPath id="inner">
+      <path d="M22 38 H78 L72 96 Q72 100 66 100 H34 Q28 100 28 96 Z" />
+    </clipPath>
+  </defs>
+
+  <!-- Interior background -->
+  <path d="M22 38 H78 L72 96 Q72 100 66 100 H34 Q28 100 28 96 Z" fill="#24344f" />
+
+  <!-- Half-full water -->
+  <g clip-path="url(#inner)">
+    <rect x="16" y="66" width="68" height="40" fill="#3aa9f0" />
+    <ellipse cx="50" cy="66" rx="32" ry="4" fill="#7fd0ff" />
+  </g>
+
+  <!-- Bucket outline -->
+  <path d="M22 38 H78 L72 96 Q72 100 66 100 H34 Q28 100 28 96 Z"
+        fill="none" stroke="#5b7baa" stroke-width="3" />
+  <!-- Rim -->
+  <ellipse cx="50" cy="38" rx="29" ry="7" fill="#2a3852" stroke="#5b7baa" stroke-width="3" />
+</svg>
