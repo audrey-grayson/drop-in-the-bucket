@@ -1,0 +1,567 @@
+/* Drop in the Bucket — mobile-first styles.
+   The app is designed phone-first: a fixed bottom tab bar, thumb-sized targets,
+   and a single-column layout. Wider screens just centre the same column.
+   See README "Mobile-first" before changing layout. */
+
+:root {
+  --bg: #0f1724;
+  --surface: #182234;
+  --surface-2: #1f2c43;
+  --text: #e8eef7;
+  --muted: #8ea2bf;
+  --accent: #38bdf8;
+  --accent-deep: #0ea5e9;
+  --water: #3aa9f0;
+  --water-light: #7fd0ff;
+  --danger: #f87171;
+  --radius: 16px;
+  --header-h: 56px;
+  --nav-h: 64px;
+
+  color-scheme: dark;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  color: var(--text);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: contain;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+h1,
+h2 {
+  margin: 0;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+/* ---------- App shell ---------- */
+.app {
+  max-width: 540px;
+  margin: 0 auto;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  height: var(--header-h);
+  display: flex;
+  align-items: center;
+  padding: 0 18px;
+  background: linear-gradient(180deg, var(--bg), rgba(15, 23, 36, 0.85));
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.app-header h1 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.app-main {
+  flex: 1;
+  padding: 16px 16px calc(var(--nav-h) + 24px);
+}
+
+/* ---------- Bottom tab bar ---------- */
+.tab-bar {
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 540px;
+  height: var(--nav-h);
+  display: flex;
+  background: var(--surface);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  z-index: 10;
+}
+
+.tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  text-decoration: none;
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+
+.tab .tab-icon {
+  font-size: 1.35rem;
+  filter: grayscale(0.4);
+  transition: transform 0.15s ease;
+}
+
+.tab.active {
+  color: var(--accent);
+}
+
+.tab.active .tab-icon {
+  filter: none;
+  transform: translateY(-2px) scale(1.1);
+}
+
+/* ---------- Buttons & cards ---------- */
+.btn {
+  border: none;
+  border-radius: 12px;
+  padding: 10px 16px;
+  background: var(--surface-2);
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn.primary {
+  background: var(--accent-deep);
+  color: #04293c;
+}
+
+.card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.empty-state {
+  text-align: center;
+  color: var(--muted);
+  padding: 48px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.empty-emoji {
+  font-size: 3rem;
+  margin: 0;
+}
+
+/* ---------- Home / buckets ---------- */
+.home {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.goal-row {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 14px 16px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.goal-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.goal-emoji {
+  font-size: 1.5rem;
+}
+
+.goal-label {
+  font-weight: 600;
+  font-size: 1.05rem;
+  flex: 1;
+}
+
+.undo-btn {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  font-size: 1.1rem;
+  padding: 4px 8px;
+}
+
+.goal-bucket {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.goal-tally {
+  flex: 1;
+  min-height: 28px;
+}
+
+/* ---------- Bucket SVG ---------- */
+.bucket {
+  background: transparent;
+  border: none;
+  padding: 0;
+  line-height: 0;
+  flex-shrink: 0;
+  transition: transform 0.12s ease;
+}
+
+.bucket:active {
+  transform: scale(0.94);
+}
+
+.bucket.splashing svg {
+  animation: bucket-wobble 0.45s ease;
+}
+
+.bucket-inside {
+  fill: var(--surface-2);
+}
+
+.bucket-body {
+  fill: none;
+  stroke: #3a4d70;
+  stroke-width: 2.5;
+}
+
+.bucket-rim {
+  fill: #2a3852;
+  stroke: #3a4d70;
+  stroke-width: 2;
+}
+
+.bucket-water {
+  fill: var(--water);
+  transition: y 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.bucket-water-surface {
+  fill: var(--water-light);
+  transition: cy 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes bucket-wobble {
+  0% { transform: translateY(0) scaleY(1); }
+  30% { transform: translateY(2px) scaleY(0.94); }
+  60% { transform: translateY(-1px) scaleY(1.03); }
+  100% { transform: translateY(0) scaleY(1); }
+}
+
+/* ---------- Falling droplet ---------- */
+.droplet-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 50;
+}
+
+.droplet {
+  position: fixed;
+  top: 0;
+  width: 18px;
+  height: 24px;
+  background: radial-gradient(circle at 35% 30%, var(--water-light), var(--water));
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  box-shadow: 0 0 10px rgba(58, 169, 240, 0.6);
+  /* Teardrop point at the bottom. */
+  clip-path: path('M9 0 C9 0 18 14 18 18 A9 9 0 1 1 0 18 C0 14 9 0 9 0 Z');
+  transition: transform 0.55s cubic-bezier(0.45, 0, 0.85, 0.5);
+  will-change: transform;
+}
+
+/* ---------- Tally marks ---------- */
+.tally {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tally-group line {
+  stroke: var(--water-light);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+
+.tally-count {
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+  margin-left: 2px;
+}
+
+.tally-empty {
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+/* ---------- Goals settings page ---------- */
+.goals-page {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.form-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.emoji-input {
+  width: 52px;
+  text-align: center;
+  font-size: 1.4rem;
+  padding: 8px 0;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--surface-2);
+  color: var(--text);
+  flex-shrink: 0;
+}
+
+.label-input {
+  flex: 1;
+  min-width: 0;
+  font-size: 1rem;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.emoji-palette {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.emoji-chip {
+  width: 40px;
+  height: 40px;
+  font-size: 1.25rem;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: var(--surface-2);
+}
+
+.emoji-chip.selected {
+  border-color: var(--accent);
+  background: rgba(56, 189, 248, 0.15);
+}
+
+.goal-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.goal-edit {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.goal-edit-actions {
+  display: flex;
+  gap: 2px;
+}
+
+.icon-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: none;
+  background: var(--surface-2);
+  font-size: 1rem;
+}
+
+.icon-btn:disabled {
+  opacity: 0.35;
+}
+
+.icon-btn.danger {
+  background: rgba(248, 113, 113, 0.12);
+}
+
+/* ---------- Stats page ---------- */
+.stats-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.stat-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 14px 6px;
+}
+
+.stat-num {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.stat-cap {
+  font-size: 0.72rem;
+  color: var(--muted);
+  text-align: center;
+}
+
+.chart-card h2,
+.week-summary h2 {
+  font-size: 1rem;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+
+.bar-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.bar-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  gap: 6px;
+}
+
+.bar-track {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  width: 100%;
+  background: var(--accent);
+  border-radius: 6px 6px 0 0;
+  min-height: 3px;
+  position: relative;
+  transition: height 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.bar-value {
+  position: absolute;
+  top: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+
+.bar-label {
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
+.week-scroll {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+.week-card {
+  flex: 0 0 220px;
+  scroll-snap-align: start;
+}
+
+.week-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+
+.week-name {
+  font-weight: 600;
+}
+
+.week-total {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.week-breakdown {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.week-breakdown li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+}
+
+.wb-emoji {
+  font-size: 1.1rem;
+}
+
+.wb-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--muted);
+}
+
+.wb-count {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
