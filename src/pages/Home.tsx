@@ -120,27 +120,25 @@ function BucketRow({
 
   return (
     <section className="goal-row">
-      <div className="goal-head">
-        <span className="goal-emoji" aria-hidden="true">
-          {emoji}
-        </span>
-        <span className="goal-label">{label}</span>
+      <span className="goal-emoji" aria-hidden="true">
+        {emoji}
+      </span>
+      <span className="goal-label">{label}</span>
+      <div className="goal-right">
         {count > 0 && (
           <button className="undo-btn" onClick={onUndo} aria-label="Undo last drop">
             ↩
           </button>
         )}
-      </div>
-      <div className="goal-bucket">
+        <div className="goal-tally">
+          <TallyMarks count={count} />
+        </div>
         <Bucket
           ref={ref}
           fill={fill}
           splashing={splashing}
           onActivate={() => onDrop(ref.current)}
         />
-        <div className="goal-tally">
-          <TallyMarks count={count} />
-        </div>
       </div>
     </section>
   )
