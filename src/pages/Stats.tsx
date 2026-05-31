@@ -107,7 +107,7 @@ export default function Stats() {
       </section>
 
       <section className="card chart-card">
-        <h2>All-time by goal</h2>
+        <h2>All-time by bucket</h2>
         <BarChart bars={goalBars} />
       </section>
 
