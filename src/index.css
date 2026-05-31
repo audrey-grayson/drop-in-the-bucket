@@ -89,7 +89,7 @@ h2 {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  padding: 16px 16px calc(var(--nav-h) + 24px);
+  padding: 16px 16px calc(var(--nav-h) + env(safe-area-inset-bottom, 0px) + 20px);
 }
 
 /* ---------- Bottom tab bar ---------- */
@@ -100,11 +100,15 @@ h2 {
   transform: translateX(-50%);
   width: 100%;
   max-width: 540px;
-  height: var(--nav-h);
   display: flex;
   background: var(--surface);
   border-top: 1px solid rgba(255, 255, 255, 0.06);
-  padding-bottom: env(safe-area-inset-bottom, 0);
+  /* Size to content (icon + label) plus the device safe-area, rather than a
+     fixed height. A fixed height with box-sizing:border-box let the safe-area
+     inset eat into the bar on phones with a home indicator, squeezing the
+     content so emoji overflowed the top. */
+  padding-top: 8px;
+  padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
   z-index: 10;
 }
 
@@ -114,16 +118,24 @@ h2 {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
+  gap: 3px;
+  padding: 2px 4px;
   text-decoration: none;
   color: var(--muted);
   font-size: 0.7rem;
+  line-height: 1;
 }
 
 .tab .tab-icon {
   font-size: 1.35rem;
+  /* line-height:1 keeps the emoji's box tight so it can't poke out the top. */
+  line-height: 1;
   filter: grayscale(0.4);
   transition: transform 0.15s ease;
+}
+
+.tab .tab-label {
+  line-height: 1;
 }
 
 .tab.active {
@@ -291,14 +303,14 @@ h2 {
 
 .bucket-body {
   fill: none;
-  stroke: #3a4d70;
-  stroke-width: 2.5;
+  stroke: #6d8cba;
+  stroke-width: 3;
 }
 
 .bucket-rim {
   fill: #2a3852;
-  stroke: #3a4d70;
-  stroke-width: 2;
+  stroke: #6d8cba;
+  stroke-width: 3;
 }
 
 .bucket-water {
