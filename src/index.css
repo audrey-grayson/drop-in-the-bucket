@@ -186,7 +186,9 @@ h2 {
 
 .goal-row {
   flex: 1 1 0;
-  min-height: 58px;
+  /* Floor so that once the list overflows and rows hit their minimum, the
+     bucket (row height minus padding) still stands ~1.5-2 text-lines tall. */
+  min-height: 78px;
   max-height: 150px;
   display: flex;
   align-items: center;
