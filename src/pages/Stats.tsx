@@ -52,7 +52,7 @@ export default function Stats() {
     const counts = new Array(7).fill(0)
     for (const d of drops) {
       if (weekStart(d.ts).getTime() === thisWeekStart) {
-        const day = (new Date(d.ts).getDay() + 6) % 7
+        const day = new Date(d.ts).getDay() // 0=Sun..6=Sat, aligned to WEEKDAYS
         counts[day]++
       }
     }

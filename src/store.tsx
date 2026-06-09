@@ -44,7 +44,8 @@ interface Store {
   updateGoal: (id: string, patch: Partial<Pick<Goal, 'emoji' | 'label'>>) => void
   deleteGoal: (id: string) => void
   moveGoal: (id: string, dir: -1 | 1) => void
-  addDrop: (goalId: string) => void
+  /** Add a drop for a goal. Pass `ts` to backdate it to an earlier day. */
+  addDrop: (goalId: string, ts?: number) => void
   /** Remove the most recent drop for a goal (undo a misfire). */
   undoDrop: (goalId: string) => void
 }
@@ -109,10 +110,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     })
   }, [])
 
-  const addDrop = useCallback((goalId: string) => {
+  const addDrop = useCallback((goalId: string, ts?: number) => {
     setState((s) => ({
       ...s,
-      drops: [...s.drops, { id: uid(), goalId, ts: Date.now() }],
+      drops: [...s.drops, { id: uid(), goalId, ts: ts ?? Date.now() }],
     }))
   }, [])
 

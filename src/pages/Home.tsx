@@ -1,13 +1,20 @@
 import { useCallback, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useStore } from '../store'
-import { isSameWeek } from '../lib/week'
+import { isSameWeek, weekStart } from '../lib/week'
 import Bucket from '../components/Bucket'
 import Droplet, { type FallingDrop } from '../components/Droplet'
 import TallyMarks from '../components/TallyMarks'
 
 function uid() {
   return Math.random().toString(36).slice(2, 9)
+}
+
+/** Midnight (local) for the day containing `ts`. */
+function dayStart(ts: number): number {
+  const d = new Date(ts)
+  d.setHours(0, 0, 0, 0)
+  return d.getTime()
 }
 
 export default function Home() {
@@ -18,6 +25,19 @@ export default function Home() {
   const pending = useRef<Record<string, string>>({})
 
   const now = Date.now()
+  const today = dayStart(now)
+  // The day new drops are credited to. Defaults to today; the day selector lets
+  // the user backdate to an earlier day this week if they forgot to log it.
+  const [selectedDay, setSelectedDay] = useState(today)
+
+  // The days of the current week, from Sunday up to (and including) today.
+  const days = useMemo(() => {
+    const start = weekStart(now).getTime()
+    const out: number[] = []
+    for (let t = start; t <= today; t += 24 * 60 * 60 * 1000) out.push(t)
+    return out
+  }, [now, today])
+
   const weekCounts = useMemo(() => {
     const counts: Record<string, number> = {}
     for (const d of drops) {
@@ -51,14 +71,18 @@ export default function Home() {
       delete pending.current[id]
       setFalling((f) => f.filter((d) => d.id !== id))
       if (!goalId) return
-      addDrop(goalId)
+      // For today, log the exact moment. For a backdated day, keep the current
+      // time-of-day but on the selected date so drops stay ordered.
+      const ts =
+        selectedDay === today ? Date.now() : selectedDay + (Date.now() - today)
+      addDrop(goalId, ts)
       setSplashing((s) => ({ ...s, [goalId]: true }))
       setTimeout(
         () => setSplashing((s) => ({ ...s, [goalId]: false })),
         450,
       )
     },
-    [addDrop],
+    [addDrop, selectedDay, today],
   )
 
   if (goals.length === 0) {
@@ -81,6 +105,13 @@ export default function Home() {
         ))}
       </div>
 
+      <DaySelector
+        days={days}
+        selected={selectedDay}
+        today={today}
+        onSelect={setSelectedDay}
+      />
+
       {goals.map((goal) => {
         const count = weekCounts[goal.id] ?? 0
         return (
@@ -95,6 +126,57 @@ export default function Home() {
           />
         )
       })}
+    </div>
+  )
+}
+
+function DaySelector({
+  days,
+  selected,
+  today,
+  onSelect,
+}: {
+  days: number[]
+  selected: number
+  today: number
+  onSelect: (ts: number) => void
+}) {
+  // Nothing to choose from on the first day of the week.
+  if (days.length < 2) return null
+  const backdating = selected !== today
+  return (
+    <div className="day-selector">
+      <div className="day-strip" role="group" aria-label="Choose a day to log">
+        {days.map((ts) => {
+          const d = new Date(ts)
+          const isToday = ts === today
+          return (
+            <button
+              key={ts}
+              className={`day-chip${ts === selected ? ' selected' : ''}`}
+              aria-pressed={ts === selected}
+              onClick={() => onSelect(ts)}
+            >
+              <span className="day-dow">
+                {isToday
+                  ? 'Today'
+                  : d.toLocaleDateString(undefined, { weekday: 'short' })}
+              </span>
+              <span className="day-num">{d.getDate()}</span>
+            </button>
+          )
+        })}
+      </div>
+      {backdating && (
+        <p className="day-hint">
+          Backdating to{' '}
+          {new Date(selected).toLocaleDateString(undefined, {
+            weekday: 'long',
+            month: 'short',
+            day: 'numeric',
+          })}
+        </p>
+      )}
     </div>
   )
 }

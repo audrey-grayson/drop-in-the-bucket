@@ -1,31 +1,23 @@
-// Week helpers. We use ISO weeks (Monday start) so the "this week" tally and
-// the per-week stats summary agree on boundaries.
+// Week helpers. Weeks start on Sunday (the usual calendar-app convention) so
+// the "this week" tally and the per-week stats summary agree on boundaries.
 
-const MS_PER_DAY = 24 * 60 * 60 * 1000
-
-/** Midnight Monday of the week containing `ts`, in local time. */
+/** Midnight Sunday of the week containing `ts`, in local time. */
 export function weekStart(ts: number): Date {
   const d = new Date(ts)
   d.setHours(0, 0, 0, 0)
-  // getDay(): 0=Sun..6=Sat. Shift so Monday is the first day.
-  const day = (d.getDay() + 6) % 7
-  d.setDate(d.getDate() - day)
+  // getDay(): 0=Sun..6=Sat — already Sunday-first, so subtract it directly.
+  d.setDate(d.getDate() - d.getDay())
   return d
 }
 
-/** Stable key for a week, e.g. "2026-W22". Sorts chronologically as a string. */
+/** Stable key for a week, e.g. "2026-05-24" (the Sunday it starts on).
+    Sorts chronologically as a string and is unique per week. */
 export function weekKey(ts: number): string {
   const start = weekStart(ts)
-  // ISO week number per the standard Thursday rule.
-  const thursday = new Date(start)
-  thursday.setDate(start.getDate() + 3)
-  const year = thursday.getFullYear()
-  const firstThursday = new Date(year, 0, 1)
-  const firstDay = (firstThursday.getDay() + 6) % 7
-  firstThursday.setDate(firstThursday.getDate() - firstDay + 3)
-  const week =
-    1 + Math.round((thursday.getTime() - firstThursday.getTime()) / (7 * MS_PER_DAY))
-  return `${year}-W${String(week).padStart(2, '0')}`
+  const y = start.getFullYear()
+  const m = String(start.getMonth() + 1).padStart(2, '0')
+  const day = String(start.getDate()).padStart(2, '0')
+  return `${y}-${m}-${day}`
 }
 
 /** Human label for a week start, e.g. "May 25". */
@@ -40,5 +32,5 @@ export function isSameWeek(a: number, b: number): boolean {
   return weekStart(a).getTime() === weekStart(b).getTime()
 }
 
-/** Short weekday labels Mon..Sun aligned to weekStart. */
-export const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const
+/** Short weekday labels Sun..Sat aligned to weekStart. */
+export const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as const
