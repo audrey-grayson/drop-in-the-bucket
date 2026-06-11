@@ -191,7 +191,12 @@ h2 {
    there are too many to fit at their min-height, `.app-main` scrolls instead.
    The bucket scales to the row height, so fewer goals = bigger buckets. */
 .home {
-  height: 100%;
+  /* min-height (not height) so the column fills the viewport when there are few
+     goals (rows flex to share the space — bigger buckets), but is free to grow
+     past the viewport when there are many. A fixed `height: 100%` pinned the box
+     to the viewport and let overflowing rows spill *past* .app-main's
+     padding-bottom, hiding the last bucket(s) behind the fixed tab bar. */
+  min-height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
