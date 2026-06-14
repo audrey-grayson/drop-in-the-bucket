@@ -114,29 +114,44 @@ export default function Stats() {
       <section className="week-summary">
         <h2>Weekly history</h2>
         <div className="week-scroll">
-          {weeks.map((w) => (
-            <article className="week-card card" key={w.key}>
-              <header className="week-card-head">
-                <span className="week-name">Week of {weekLabel(w.startTs)}</span>
-                <span className="week-total">{w.total}</span>
-              </header>
-              <ul className="week-breakdown">
-                {Object.entries(w.perGoal)
-                  .sort((a, b) => b[1] - a[1])
-                  .map(([goalId, n]) => (
-                    <li key={goalId}>
-                      <span className="wb-emoji">
-                        {goalById[goalId]?.emoji ?? '❓'}
-                      </span>
-                      <span className="wb-label">
-                        {goalById[goalId]?.label ?? 'Deleted goal'}
-                      </span>
-                      <span className="wb-count">{n}</span>
+          {weeks.map((w) => {
+            // Goals with no drops this week, listed under a divider so the card
+            // shows the full picture (what got attention and what got missed).
+            const missed = goals.filter((g) => !(g.id in w.perGoal))
+            return (
+              <article className="week-card card" key={w.key}>
+                <header className="week-card-head">
+                  <span className="week-name">Week of {weekLabel(w.startTs)}</span>
+                  <span className="week-total">{w.total}</span>
+                </header>
+                <ul className="week-breakdown">
+                  {Object.entries(w.perGoal)
+                    .sort((a, b) => b[1] - a[1])
+                    .map(([goalId, n]) => (
+                      <li key={goalId}>
+                        <span className="wb-emoji">
+                          {goalById[goalId]?.emoji ?? '❓'}
+                        </span>
+                        <span className="wb-label">
+                          {goalById[goalId]?.label ?? 'Deleted goal'}
+                        </span>
+                        <span className="wb-count">{n}</span>
+                      </li>
+                    ))}
+                  {missed.length > 0 && (
+                    <li className="wb-divider" role="separator" />
+                  )}
+                  {missed.map((g) => (
+                    <li className="wb-missed" key={g.id}>
+                      <span className="wb-emoji">{g.emoji}</span>
+                      <span className="wb-label">{g.label}</span>
+                      <span className="wb-count">0</span>
                     </li>
                   ))}
-              </ul>
-            </article>
-          ))}
+                </ul>
+              </article>
+            )
+          })}
         </div>
       </section>
     </div>

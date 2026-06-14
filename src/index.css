@@ -690,3 +690,16 @@ h2 {
   font-variant-numeric: tabular-nums;
   font-weight: 600;
 }
+
+/* Divider between goals that got drops and the ones that were missed. */
+.wb-divider {
+  height: 1px;
+  padding: 0;
+  margin: 2px 0;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Goals with zero drops this week: dimmed so they read as "missed". */
+.wb-missed {
+  opacity: 0.5;
+}
