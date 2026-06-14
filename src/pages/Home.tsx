@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useStore } from '../store'
-import { isSameWeek, weekStart } from '../lib/week'
+import { isSameWeek } from '../lib/week'
 import Bucket from '../components/Bucket'
 import Droplet, { type FallingDrop } from '../components/Droplet'
 import TallyMarks from '../components/TallyMarks'
@@ -27,24 +27,35 @@ export default function Home() {
   const now = Date.now()
   const today = dayStart(now)
   // The day new drops are credited to. Defaults to today; the day selector lets
-  // the user backdate to an earlier day this week if they forgot to log it.
+  // the user backdate to any of the last 7 days if they forgot to log it.
   const [selectedDay, setSelectedDay] = useState(today)
 
-  // The days of the current week, from Sunday up to (and including) today.
+  // The last 7 days, oldest first, ending today. This is a rolling window that
+  // intentionally crosses week boundaries (e.g. on Sunday it still reaches back
+  // through the previous Saturday) so a recently-missed day is always editable.
+  // Built with Date arithmetic rather than fixed 86_400_000ms steps so it stays
+  // correct across daylight-saving transitions.
   const days = useMemo(() => {
-    const start = weekStart(now).getTime()
     const out: number[] = []
-    for (let t = start; t <= today; t += 24 * 60 * 60 * 1000) out.push(t)
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(today)
+      d.setDate(d.getDate() - i)
+      out.push(d.getTime())
+    }
     return out
-  }, [now, today])
+  }, [today])
 
+  // Bucket tallies follow the *selected* day's week, not always the current one.
+  // That way backdating into a previous week immediately shows the drop landing
+  // in the tally/fill, and switching back to today restores this week's view.
   const weekCounts = useMemo(() => {
     const counts: Record<string, number> = {}
     for (const d of drops) {
-      if (isSameWeek(d.ts, now)) counts[d.goalId] = (counts[d.goalId] ?? 0) + 1
+      if (isSameWeek(d.ts, selectedDay))
+        counts[d.goalId] = (counts[d.goalId] ?? 0) + 1
     }
     return counts
-  }, [drops, now])
+  }, [drops, selectedDay])
 
   const launch = useCallback(
     (goalId: string, bucketEl: HTMLButtonElement | null) => {
@@ -122,7 +133,7 @@ export default function Home() {
             count={count}
             splashing={!!splashing[goal.id]}
             onDrop={(el) => launch(goal.id, el)}
-            onUndo={() => undoDrop(goal.id)}
+            onUndo={() => undoDrop(goal.id, selectedDay)}
           />
         )
       })}
