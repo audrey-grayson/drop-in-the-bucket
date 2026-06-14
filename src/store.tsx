@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from 'react'
 import { SCHEMA_VERSION, type Drop, type Goal, type PersistedState } from './types'
+import { isSameWeek } from './lib/week'
 
 const STORAGE_KEY = 'ditb.state'
 
@@ -46,8 +47,13 @@ interface Store {
   moveGoal: (id: string, dir: -1 | 1) => void
   /** Add a drop for a goal. Pass `ts` to backdate it to an earlier day. */
   addDrop: (goalId: string, ts?: number) => void
-  /** Remove the most recent drop for a goal (undo a misfire). */
-  undoDrop: (goalId: string) => void
+  /**
+   * Remove the most recent drop for a goal (undo a misfire). Pass `withinTs` to
+   * scope the undo to the week containing that timestamp, so undoing while
+   * backdating removes a drop from the week you are looking at rather than the
+   * globally-latest one.
+   */
+  undoDrop: (goalId: string, withinTs?: number) => void
 }
 
 const StoreContext = createContext<Store | null>(null)
@@ -117,12 +123,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     }))
   }, [])
 
-  const undoDrop = useCallback((goalId: string) => {
+  const undoDrop = useCallback((goalId: string, withinTs?: number) => {
     setState((s) => {
       let latestIdx = -1
       let latestTs = -Infinity
       s.drops.forEach((d, i) => {
-        if (d.goalId === goalId && d.ts > latestTs) {
+        if (d.goalId !== goalId) return
+        if (withinTs !== undefined && !isSameWeek(d.ts, withinTs)) return
+        if (d.ts > latestTs) {
           latestTs = d.ts
           latestIdx = i
         }
